@@ -1,0 +1,4 @@
+# github.com/TamWilliam/ProjetGoReservation.git
+.\main.go:11:2: fmt redeclared in this block
+	.\main.go:4:2: other declaration of fmt
+.\main.go:11:2: "fmt" imported and not used
