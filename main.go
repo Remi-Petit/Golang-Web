@@ -1,16 +1,20 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"html/template"
 	"net/http"
 
-	"github.com/gorilla/mux"
-
-	"database/sql"
-	"fmt"
-
 	_ "github.com/lib/pq"
+)
+
+const (
+	host     = "localhost"
+	port     = 5432
+	user     = "postgres"
+	password = "admin"
+	dbname   = "test"
 )
 
 type Todo struct {
@@ -21,48 +25,6 @@ type Todo struct {
 type TodoPageData struct {
 	PageTitle string
 	Todos     []Todo
-}
-
-func connectDB() (*sql.DB, error) {
-	connStr := "user=admin dbname=test sslmode=disable"
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		return nil, err
-	}
-
-	err = db.Ping()
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Println("Connexion à la base de données établie")
-	return db, nil
-}
-
-func fetchSomeData(db *sql.DB) {
-	rows, err := db.Query("SELECT * FROM test")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var id int
-		var name string
-		// Lire les résultats dans des variables
-		err := rows.Scan(&id, &name)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Printf("ID: %d, Nom: %s\n", id, name)
-	}
-}
-
-func closeDB(db *sql.DB) {
-	db.Close()
-	fmt.Println("Connexion à la base de données fermée")
 }
 
 func main() {
@@ -81,14 +43,24 @@ func main() {
 		tmpl.Execute(w, data)
 	})
 
-	r := mux.NewRouter()
-	r.HandleFunc("/books/{title}/page/{page}", func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		title := vars["title"]
-		page := vars["page"]
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
 
-		fmt.Fprintf(w, "You've requested the book: %s on page %s\n", title, page)
-	})
+	db, err := sql.Open("postgres", psqlInfo)
+
+	db.query
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Successfully connected!")
 
 	http.ListenAndServe(":80", nil)
 }

@@ -1,4 +1,2 @@
 # github.com/TamWilliam/ProjetGoReservation.git
-.\main.go:11:2: fmt redeclared in this block
-	.\main.go:4:2: other declaration of fmt
-.\main.go:11:2: "fmt" imported and not used
+.\main.go:52:5: db.query undefined (type *sql.DB has no field or method query, but does have Query)
